@@ -1,0 +1,11 @@
+librosa
+praat-parselmouth
+openai-whisper
+spacy
+pandas
+tqdm
+joblib
+numpy
+scipy
+soundfile
+scikit-learn

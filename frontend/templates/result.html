@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Result</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+<h2>Alzheimer Detection Result</h2>
+
+{% if result and result.classification %}
+  <div class="card">
+    <p><strong>Classification:</strong> {{ result.classification }}</p>
+    <p><strong>MMSE Score:</strong> {{ result.mmse_score }}</p>
+  </div>
+{% else %}
+  <p>No prediction available.</p>
+{% endif %}
+
+<button onclick="window.location.href='/'">
+  Test Another Patient
+</button>
+
+</body>
+</html>
