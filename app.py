@@ -8,8 +8,9 @@ import traceback
 
 from main import predict   # NOW THIS WILL WORK
 
-FFMPEG_PATH = r"C:\Users\Sagar\Downloads\ffmpeg-8.0.1-essentials_build\ffmpeg-8.0.1-essentials_build\bin\ffmpeg.exe"
-# FFMPEG_PATH = r"C:\Users\Sagar\Downloads\ffmpeg-8.0.1-essentials_build\bin\ffmpeg.exe"
+# FFMPEG_PATH = r"C:\Users\Sagar\Downloads\ffmpeg-8.0.1-essentials_build\ffmpeg-8.0.1-essentials_build\bin\ffmpeg.exe"
+
+FFMPEG_PATH = "ffmpeg"
 FFPLAY_PATH = r"C:\Users\Sagar\Downloads\ffmpeg-8.0.1-essentials_build\ffmpeg-8.0.1-essentials_build\bin\ffplay.exe"
 FFPROBE_PATH = r"C:\Users\Sagar\Downloads\ffmpeg-8.0.1-essentials_build\ffmpeg-8.0.1-essentials_build\bin\ffprobe.exe"
 app = FastAPI()

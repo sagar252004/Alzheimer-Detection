@@ -9,7 +9,7 @@ import spacy
 from tqdm import tqdm
 # from google.colab import drive
 
-whisper_model = whisper.load_model("base")
+whisper_model = whisper.load_model("tiny")
 nlp = spacy.load("en_core_web_sm")
 # drive.mount("/content/drive")
 # audio_path = "/content/drive/MyDrive/ADReSSo/ADReSS M/train/adrso317.mp3"
