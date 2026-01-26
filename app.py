@@ -1,4 +1,38 @@
+from fastapi import FastAPI, UploadFile, File, Request, HTTPException
+from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 from fastapi.concurrency import run_in_threadpool
+import os
+import subprocess
+import traceback
+
+from main import predict
+
+FFMPEG_PATH = "ffmpeg"
+
+app = FastAPI()
+
+# Static & templates
+app.mount("/static", StaticFiles(directory="frontend/static"), name="static")
+templates = Jinja2Templates(directory="frontend/templates")
+
+# Temp directory
+TEMP_DIR = "temp_audio"
+os.makedirs(TEMP_DIR, exist_ok=True)
+
+
+# -------------------- ROUTES --------------------
+
+@app.get("/", response_class=HTMLResponse)
+def index(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
+
+
+@app.get("/audio", response_class=HTMLResponse)
+def audio(request: Request):
+    return templates.TemplateResponse("audio.html", {"request": request})
+
 
 @app.post("/predict")
 async def predict_audio(file: UploadFile = File(...)):
@@ -35,3 +69,23 @@ async def predict_audio(file: UploadFile = File(...)):
     except Exception as e:
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/result", response_class=HTMLResponse)
+def result(request: Request):
+    """
+    Result page.
+    Data is rendered via JS using sessionStorage.
+    """
+    return templates.TemplateResponse(
+        "result.html",
+        {"request": request}
+    )
+
+
+# -------------------- SERVER --------------------
+
+if __name__ == "__main__":
+    import uvicorn
+    port = int(os.environ.get("PORT", 10000))
+    uvicorn.run("app:app", host="0.0.0.0", port=port)
