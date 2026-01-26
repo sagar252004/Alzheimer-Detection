@@ -66,6 +66,8 @@ async def predict_audio(file: UploadFile = File(...)):
 
         # ⬇️ Run ML inference in threadpool
         result = await run_in_threadpool(predict, output_path)
+        print("PREDICTION RESULT:", result)
+
 
         return JSONResponse({
             "status": "ok",

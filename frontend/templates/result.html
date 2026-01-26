@@ -8,18 +8,33 @@
 
 <h2>Alzheimer Detection Result</h2>
 
-{% if result and result.classification %}
-  <div class="card">
-    <p><strong>Classification:</strong> {{ result.classification }}</p>
-    <p><strong>MMSE Score:</strong> {{ result.mmse_score }}</p>
-  </div>
-{% else %}
-  <p>No prediction available.</p>
-{% endif %}
+<div class="card" id="result-card">
+  <p>Loading result...</p>
+</div>
 
 <button onclick="window.location.href='/'">
   Test Another Patient
 </button>
+
+<script>
+  const result = JSON.parse(sessionStorage.getItem("prediction_result"));
+
+  const card = document.getElementById("result-card");
+
+  if (result) {
+    card.innerHTML = `
+      <p><strong>Classification:</strong> ${result.classification}</p>
+      <p><strong>MMSE Score:</strong> ${result.mmse_score}</p>
+      <p><strong>Status:</strong> ${
+        result.classification === "HC"
+          ? "Healthy Control"
+          : "Alzheimer’s Detected"
+      }</p>
+    `;
+  } else {
+    card.innerHTML = "<p>No prediction available.</p>";
+  }
+</script>
 
 </body>
 </html>

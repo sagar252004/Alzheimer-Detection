@@ -30,29 +30,45 @@ mediaRecorder.onstop = () => {
 
   statusText.innerText = "Processing audio...";
 
-  fetch("/predict", {
-    method: "POST",
-    body: formData
-  })
-    .then(async (res) => {
-      console.log("Predict response status:", res.status);
+  // fetch("/predict", {
+  //   method: "POST",
+  //   body: formData
+  // })
+  //   .then(async (res) => {
+  //     console.log("Predict response status:", res.status);
 
-      const text = await res.text(); // 🔥 FORCE READ RESPONSE
-      console.log("Raw response:", text);
+  //     const text = await res.text(); // 🔥 FORCE READ RESPONSE
+  //     console.log("Raw response:", text);
 
-      const data = JSON.parse(text);
+  //     const data = JSON.parse(text);
 
-      if (data.status === "ok") {
-        sessionStorage.setItem("result", JSON.stringify(data.result));
-        window.location.href = "/result";
-      } else {
-        statusText.innerText = "Prediction failed";
-      }
+  //     if (data.status === "ok") {
+  //       sessionStorage.setItem("result", JSON.stringify(data.result));
+  //       window.location.href = "/result";
+  //     } else {
+  //       statusText.innerText = "Prediction failed";
+  //     }
+    // })
+    fetch("/predict", {
+      method: "POST",
+      body: formData
     })
-    .catch((err) => {
-      console.error("Predict error:", err);
-      statusText.innerText = "Server error";
-    });
+  .then(res => res.json())
+  .then(data => {
+    console.log("Prediction response:", data);
+
+    sessionStorage.setItem(
+      "prediction_result",
+      JSON.stringify(data.result)
+    );
+
+    window.location.href = "/result";
+  });
+
+      // .catch((err) => {
+      //   console.error("Predict error:", err);
+      //   statusText.innerText = "Server error";
+      // });
 };
 
     mediaRecorder.start();
