@@ -30,9 +30,16 @@ def predict(audio_path: str):
 
     features = extract_features(audio_path)
     features_df = pd.DataFrame([features], columns=FEATURE_ORDER)
+    features_df = features_df.fillna(0)
+
+
+    print(features_df.isna().sum())
+    print(features_df.head())
 
     classification_pred = classifier_model.predict(features_df)[0]
     mmse_pred = mmse_model.predict(features_df)[0]
+
+    
 
     return {
         "classification": "AD" if classification_pred == 1 else "HC",

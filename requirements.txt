@@ -12,6 +12,7 @@ numpy
 scipy
 soundfile
 scikit-learn
+
 fastapi==0.110.0
 starlette==0.36.3
 uvicorn[standard]==0.29.0
