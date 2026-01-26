@@ -23,12 +23,21 @@ def get_whisper():
         _whisper_model = whisper.load_model("tiny")
     return _whisper_model
 
+# def get_nlp():
+#     global _nlp
+#     if _nlp is None:
+#         _nlp = spacy.load("en_core_web_sm")
+#     return _nlp
+
 def get_nlp():
     global _nlp
     if _nlp is None:
-        _nlp = spacy.load("en_core_web_sm")
+        try:
+            _nlp = spacy.load("en_core_web_sm")
+        except OSError:
+            # Fallback: blank English pipeline (Python 3.13 safe)
+            _nlp = spacy.blank("en")
     return _nlp
-
 
 def safe_stats(x):
     x = np.array(x).flatten()
