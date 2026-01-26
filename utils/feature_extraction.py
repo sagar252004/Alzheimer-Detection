@@ -9,10 +9,26 @@ import spacy
 from tqdm import tqdm
 # from google.colab import drive
 
-whisper_model = whisper.load_model("tiny")
-nlp = spacy.load("en_core_web_sm")
+# whisper_model = whisper.load_model("tiny")
+# nlp = spacy.load("en_core_web_sm")
 # drive.mount("/content/drive")
 # audio_path = "/content/drive/MyDrive/ADReSSo/ADReSS M/train/adrso317.mp3"
+
+_whisper_model = None
+_nlp = None
+
+def get_whisper():
+    global _whisper_model
+    if _whisper_model is None:
+        _whisper_model = whisper.load_model("tiny")
+    return _whisper_model
+
+def get_nlp():
+    global _nlp
+    if _nlp is None:
+        _nlp = spacy.load("en_core_web_sm")
+    return _nlp
+
 
 def safe_stats(x):
     x = np.array(x).flatten()
@@ -121,8 +137,10 @@ def extract_features(audio_path):
     features["pause_max_duration"]  = pause_stats["max"]
 
 
-    text = whisper_model.transcribe(y, task="translate")["text"]
+    whisper_model = get_whisper()
+    nlp = get_nlp()
 
+    text = whisper_model.transcribe(y, task="translate")["text"]
     doc = nlp(text)
 
     words = [t for t in doc if t.is_alpha]
