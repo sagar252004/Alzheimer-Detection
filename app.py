@@ -3,6 +3,7 @@ from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.concurrency import run_in_threadpool
+from functools import partial
 import os
 import subprocess
 import traceback
@@ -46,28 +47,36 @@ async def predict_audio(file: UploadFile = File(...)):
         input_path = os.path.join(TEMP_DIR, "sample.webm")
         output_path = os.path.join(TEMP_DIR, "converted.wav")
 
-        # Save uploaded file (async-safe)
         with open(input_path, "wb") as f:
             f.write(await file.read())
 
-        # ⬇️ Run FFmpeg in threadpool
+        # ✅ FIXED: use partial for kwargs
+        ffmpeg_cmd = [
+            FFMPEG_PATH,
+            "-y",
+            "-i", input_path,
+            "-ar", "16000",
+            "-ac", "1",
+            output_path
+        ]
+
+        # await run_in_threadpool(
+        #     partial(subprocess.run, ffmpeg_cmd, check=True)
+        # )
         await run_in_threadpool(
-            subprocess.run,
-            [
-                FFMPEG_PATH,
-                "-y",
-                "-i", input_path,
-                "-ar", "16000",
-                "-ac", "1",
-                output_path
-            ],
-            check=True
+            partial(
+                subprocess.run,
+                ffmpeg_cmd,
+                check=True,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL
+            )
         )
 
-        # ⬇️ Run ML inference in threadpool
-        result = await run_in_threadpool(predict, output_path)
-        print("PREDICTION RESULT:", result)
-
+        # ✅ FIXED: ML inference also wrapped correctly
+        result = await run_in_threadpool(
+            partial(predict, output_path)
+        )
 
         return JSONResponse({
             "status": "ok",
@@ -77,7 +86,6 @@ async def predict_audio(file: UploadFile = File(...)):
     except Exception as e:
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
-
 
 @app.get("/result", response_class=HTMLResponse)
 def result(request: Request):
