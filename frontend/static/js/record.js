@@ -29,14 +29,33 @@ startBtn.onclick = async () => {
       const formData = new FormData();
       formData.append("file", audioBlob, "sample.webm");
 
+      // statusText.innerText = "Processing audio...";
+
+      // await fetch("/predict", {
+      //   method: "POST",
+      //   body: formData
+      // });
+
+      // window.location.href = "/result";
+      
       statusText.innerText = "Processing audio...";
 
-      await fetch("/predict", {
+      fetch("/predict", {
         method: "POST",
         body: formData
+      })
+      .then(res => {
+        if (!res.ok) throw new Error("Prediction failed");
+        return res.json();
+      })
+      .then(() => {
+        window.location.href = "/result";
+      })
+      .catch(err => {
+        console.error(err);
+        statusText.innerText = "Prediction failed. Try again.";
       });
 
-      window.location.href = "/result";
     };
 
     mediaRecorder.start();

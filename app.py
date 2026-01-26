@@ -12,14 +12,16 @@ FFMPEG_PATH = "ffmpeg"
 
 app = FastAPI()
 
+# Static & templates
 app.mount("/static", StaticFiles(directory="frontend/static"), name="static")
 templates = Jinja2Templates(directory="frontend/templates")
 
+# Temp directory
 TEMP_DIR = "temp_audio"
 os.makedirs(TEMP_DIR, exist_ok=True)
 
-LAST_RESULT = {}
 
+# -------------------- ROUTES --------------------
 
 @app.get("/", response_class=HTMLResponse)
 def index(request: Request):
@@ -33,13 +35,19 @@ def audio(request: Request):
 
 @app.post("/predict")
 async def predict_audio(file: UploadFile = File(...)):
+    """
+    Receives recorded audio, converts it to WAV,
+    runs ML prediction, and RETURNS result as JSON
+    """
     try:
-        input_path = os.path.join(TEMP_DIR, file.filename)
+        input_path = os.path.join(TEMP_DIR, "sample.webm")
         output_path = os.path.join(TEMP_DIR, "converted.wav")
 
+        # Save uploaded file
         with open(input_path, "wb") as f:
             f.write(await file.read())
 
+        # Convert webm → wav
         subprocess.run(
             [
                 FFMPEG_PATH,
@@ -52,11 +60,14 @@ async def predict_audio(file: UploadFile = File(...)):
             check=True
         )
 
+        # ML prediction
         result = predict(output_path)
-        LAST_RESULT.clear()
-        LAST_RESULT.update(result)
 
-        return JSONResponse({"status": "ok"})
+        # ✅ RETURN RESULT (NO GLOBAL STATE)
+        return JSONResponse({
+            "status": "ok",
+            "result": result
+        })
 
     except Exception as e:
         traceback.print_exc()
@@ -65,24 +76,17 @@ async def predict_audio(file: UploadFile = File(...)):
 
 @app.get("/result", response_class=HTMLResponse)
 def result(request: Request):
-    if not LAST_RESULT:
-        return templates.TemplateResponse(
-            "result.html",
-            {
-                "request": request,
-                "result": None,
-                "message": "No prediction yet. Please upload audio first."
-            }
-        )
-
+    """
+    Result page.
+    Data is rendered via JS using sessionStorage.
+    """
     return templates.TemplateResponse(
         "result.html",
-        {
-            "request": request,
-            "result": LAST_RESULT,
-            "message": None
-        }
+        {"request": request}
     )
+
+
+# -------------------- SERVER --------------------
 
 if __name__ == "__main__":
     import uvicorn
