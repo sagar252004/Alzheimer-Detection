@@ -22,41 +22,38 @@ startBtn.onclick = async () => {
       }
     };
 
-    mediaRecorder.onstop = async () => {
-      // Browser gives WEBM, not WAV
-      const audioBlob = new Blob(audioChunks, { type: "audio/webm" });
+mediaRecorder.onstop = () => {
+  const audioBlob = new Blob(audioChunks, { type: "audio/webm" });
 
-      const formData = new FormData();
-      formData.append("file", audioBlob, "sample.webm");
+  const formData = new FormData();
+  formData.append("file", audioBlob, "sample.webm");
 
-      // statusText.innerText = "Processing audio...";
+  statusText.innerText = "Processing audio...";
 
-      // await fetch("/predict", {
-      //   method: "POST",
-      //   body: formData
-      // });
+  fetch("/predict", {
+    method: "POST",
+    body: formData
+  })
+    .then(async (res) => {
+      console.log("Predict response status:", res.status);
 
-      // window.location.href = "/result";
-      
-      statusText.innerText = "Processing audio...";
+      const text = await res.text(); // 🔥 FORCE READ RESPONSE
+      console.log("Raw response:", text);
 
-      fetch("/predict", {
-        method: "POST",
-        body: formData
-      })
-      .then(res => {
-        if (!res.ok) throw new Error("Prediction failed");
-        return res.json();
-      })
-      .then(() => {
+      const data = JSON.parse(text);
+
+      if (data.status === "ok") {
+        sessionStorage.setItem("result", JSON.stringify(data.result));
         window.location.href = "/result";
-      })
-      .catch(err => {
-        console.error(err);
-        statusText.innerText = "Prediction failed. Try again.";
-      });
-
-    };
+      } else {
+        statusText.innerText = "Prediction failed";
+      }
+    })
+    .catch((err) => {
+      console.error("Predict error:", err);
+      statusText.innerText = "Server error";
+    });
+};
 
     mediaRecorder.start();
     statusText.innerText = "Recording...";
