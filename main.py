@@ -1,25 +1,32 @@
 # main.py (ML ONLY)
 
 import os
-import uuid
 import pandas as pd
 import joblib
-import shutil
 
 from utils.feature_extraction import extract_features, FEATURE_ORDER
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-classifier_model = joblib.load(
-    os.path.join(BASE_DIR, "models", "svm_classifier.pkl")
-)
+# ---------- LAZY-LOADED MODELS ----------
+_classifier_model = None
+_mmse_model = None
 
-mmse_model = joblib.load(
-    os.path.join(BASE_DIR, "models", "svm_regressor.pkl")
-)
 
-TEMP_DIR = os.path.join(BASE_DIR, "temp_audio")
-os.makedirs(TEMP_DIR, exist_ok=True)
+def get_models():
+    global _classifier_model, _mmse_model
+
+    if _classifier_model is None:
+        _classifier_model = joblib.load(
+            os.path.join(BASE_DIR, "models", "svm_classifier.pkl")
+        )
+
+    if _mmse_model is None:
+        _mmse_model = joblib.load(
+            os.path.join(BASE_DIR, "models", "svm_regressor.pkl")
+        )
+
+    return _classifier_model, _mmse_model
 
 
 def predict(audio_path: str):
@@ -28,18 +35,16 @@ def predict(audio_path: str):
     Output: dict with classification + mmse score
     """
 
+    # Feature extraction
     features = extract_features(audio_path)
     features_df = pd.DataFrame([features], columns=FEATURE_ORDER)
-    features_df = features_df.fillna(0)
+    features_df = features_df.replace([float("inf"), float("-inf")], 0).fillna(0)
 
-
-    print(features_df.isna().sum())
-    print(features_df.head())
+    # Load models only when needed
+    classifier_model, mmse_model = get_models()
 
     classification_pred = classifier_model.predict(features_df)[0]
     mmse_pred = mmse_model.predict(features_df)[0]
-
-    
 
     return {
         "classification": "AD" if classification_pred == 1 else "HC",
