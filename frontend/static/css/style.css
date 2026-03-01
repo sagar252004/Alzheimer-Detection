@@ -1,21 +1,214 @@
 body {
-  font-family: Arial;
-  text-align: center;
-  margin-top: 40px;
+  font-family: "Inter", Arial, sans-serif;
+  background: linear-gradient(135deg, #f0f4ff, #e6ecff);
+  min-height: 100vh;
+  margin: 0;
+
+  display: flex;
+  justify-content: center;   /* center horizontally */
+  align-items: flex-start;   /* ⬅️ move content to top */
 }
 
-input, select, button {
-  display: block;
-  margin: 10px auto;
-  padding: 10px;
-  width: 250px;
-}
+
+/* Card */
 .card {
-  border: 1px solid #ccc;
-  width: 300px;
-  margin: 20px auto;
-  padding: 20px;
-  border-radius: 8px;
-  background: #f9f9f9;
+  background: #ffffff;
+  width: 100%;
+  max-width: 640px;
+  margin-top: 60px; 
+  padding: 32px 36px;
+  border-radius: 18px;
+  box-shadow:
+    0 20px 40px rgba(0, 0, 0, 0.08),
+    0 8px 16px rgba(0, 0, 0, 0.05);
+  text-align: center;
+  animation: fadeIn 0.4s ease-in-out;
 }
 
+/* Headings */
+h2 {
+  font-size: 24px;
+  margin-bottom: 6px;
+  color: #111827;
+}
+
+h3 {
+  font-size: 15px;
+  font-weight: 500;
+  color: #6b7280;
+  margin-bottom: 20px;
+}
+
+/* Image */
+.card img {
+  width: 100%;
+  max-width: 420px;     /* ⬅️ matches wider card */
+  height: auto;
+  border-radius: 14px;
+  margin: 20px auto;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+}
+
+/* Inputs & Buttons */
+input,
+select,
+button {
+  width: 100%;
+  padding: 14px;
+  margin: 12px 0;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  font-size: 15px;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+input:focus,
+select:focus {
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+}
+
+button {
+  background: #4f46e5;
+  color: #ffffff;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #4338ca;
+}
+
+button:disabled {
+  background: #a5b4fc;
+  cursor: not-allowed;
+}
+
+/* Status & Timer */
+#status {
+  margin-top: 12px;
+  font-size: 14px;
+  color: #444;
+}
+
+#timer {
+  font-size: 18px;
+  font-weight: bold;
+  color: #4f46e5;
+  margin-top: 10px;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  .card {
+    max-width: 94%;
+    padding: 22px;
+  }
+
+  h2 {
+    font-size: 20px;
+  }
+}
+
+/* 🔴 REC indicator */
+#rec-indicator {
+  display: none;
+  font-weight: bold;
+  color: #dc2626;
+  margin-top: 12px;
+}
+
+#rec-indicator .dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background: #dc2626;
+  border-radius: 50%;
+  margin-right: 6px;
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0%, 50%, 100% { opacity: 1; }
+  25%, 75% { opacity: 0; }
+}
+
+/* ⏳ Progress bar */
+.progress-container {
+  width: 100%;
+  height: 8px;
+  background: #e5e7eb;
+  border-radius: 6px;
+  margin-top: 12px;
+  overflow: hidden;
+}
+
+#progress-bar {
+  height: 100%;
+  width: 0%;
+  background: #4f46e5;
+  transition: width 1s linear;
+}
+
+/* 🎙️ Mic animation */
+#mic-animation {
+  font-size: 28px;
+  margin-top: 12px;
+  display: none;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 0.7; }
+  50% { transform: scale(1.15); opacity: 1; }
+  100% { transform: scale(1); opacity: 0.7; }
+}
+
+/* ✅ Minimum reached message */
+#min-status {
+  color: #16a34a;
+  font-weight: 600;
+  margin-top: 10px;
+}
+
+/* ============================= */
+/* Result Page Layout */
+/* ============================= */
+
+.result-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.result-container {
+  width: 100%;
+  max-width: 720px;
+  padding: 40px;
+  text-align: center;
+}
+
+.result-container h2 {
+  margin-bottom: 30px;
+}
+
+/* Result button spacing */
+.result-container button {
+  margin-top: 30px;
+  max-width: 320px;
+}

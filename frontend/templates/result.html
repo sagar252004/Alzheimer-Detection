@@ -4,37 +4,39 @@
   <title>Result</title>
   <link rel="stylesheet" href="/static/css/style.css">
 </head>
-<body>
 
-<h2>Alzheimer Detection Result</h2>
+<body class="result-page">
 
-<div class="card" id="result-card">
-  <p>Loading result...</p>
-</div>
+  <div class="result-container">
 
-<button onclick="window.location.href='/'">
-  Test Another Patient
-</button>
+    <h2>Alzheimer Detection Result</h2>
 
-<script>
-  const result = JSON.parse(sessionStorage.getItem("prediction_result"));
+    <!-- DO NOT change class or id -->
+    <div class="card" id="result-card">
+      <p>Loading result...</p>
+    </div>
 
-  const card = document.getElementById("result-card");
+    <button onclick="window.location.href='/'">
+      Test Another Patient
+    </button>
 
-  if (result) {
-    card.innerHTML = `
-      <p><strong>Classification:</strong> ${result.classification}</p>
-      <p><strong>MMSE Score:</strong> ${result.mmse_score}</p>
-      <p><strong>Status:</strong> ${
-        result.classification === "HC"
-          ? "Healthy Control"
-          : "Alzheimer’s Detected"
-      }</p>
-    `;
-  } else {
-    card.innerHTML = "<p>No prediction available.</p>";
-  }
-</script>
+  </div>
+
+  <script>
+    const result = JSON.parse(sessionStorage.getItem("prediction_result"));
+
+    const card = document.getElementById("result-card");
+
+    if (result) {
+      card.innerHTML = `
+        <p><strong>Classification:</strong> ${result.classification}</p>
+        <p><strong>MMSE Score:</strong> ${result.mmse_score}</p>
+        
+      `;
+    } else {
+      card.innerHTML = "<p>No prediction available.</p>";
+    }
+  </script>
 
 </body>
 </html>

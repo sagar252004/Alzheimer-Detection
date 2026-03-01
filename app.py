@@ -7,9 +7,8 @@ from functools import partial
 import os
 import subprocess
 import traceback
-
-from main import predict
-
+import uuid
+import requests
 FFMPEG_PATH = "ffmpeg"
 
 app = FastAPI()
@@ -41,28 +40,98 @@ def audio(request: Request):
     return templates.TemplateResponse("audio.html", {"request": request})
 
 
+#@app.post("/predict")
+# async def predict_audio(file: UploadFile = File(...)):
+#     try:
+#         # input_path = os.path.join(TEMP_DIR, "sample.webm")
+#         # output_path = os.path.join(TEMP_DIR, "converted.wav")
+#         uid = str(uuid.uuid4())
+#         input_path = os.path.join(TEMP_DIR, f"{uid}.webm")
+#         output_path = os.path.join(TEMP_DIR, f"{uid}.wav")
+#         with open(input_path, "wb") as f:
+#             f.write(await file.read())
+
+#         # ✅ FIXED: use partial for kwargs
+#         # ffmpeg_cmd = [
+#         #     FFMPEG_PATH,
+#         #     "-y",
+#         #     "-i", input_path,
+#         #     "-ar", "16000",
+#         #     "-ac", "1",
+#         #     output_path
+#         # ]
+#         ffmpeg_cmd = [
+#             FFMPEG_PATH,
+#             "-y",
+#             "-i", input_path,
+
+#             # 🔥 force PCM
+#             "-acodec", "pcm_s16le",
+#             "-ar", "16000",
+#             "-ac", "1",
+
+#             # 🔥 loudness normalize to speech level
+#             "-af", "loudnorm=I=-16:TP=-1.5:LRA=11",
+
+#             output_path
+# ]
+#         # await run_in_threadpool(
+#         #     partial(subprocess.run, ffmpeg_cmd, check=True)
+#         # )
+#         await run_in_threadpool(
+#             partial(
+#                 subprocess.run,
+#                 ffmpeg_cmd,
+#                 check=True,
+#                 stdout=subprocess.DEVNULL,
+#                 stderr=subprocess.DEVNULL
+#             )
+#         )
+#         print("Converted WAV size:", os.path.getsize(output_path))
+
+#         # ✅ FIXED: ML inference also wrapped correctly
+#         result = await run_in_threadpool(
+#             partial(predict, output_path)
+#         )
+#         # 🧹 cleanup temp files
+#         if os.path.exists(input_path):
+#             os.remove(input_path)
+
+#         if os.path.exists(output_path):
+#             os.remove(output_path)
+
+#         return JSONResponse({
+#             "status": "ok",
+#             "result": result
+#         })
+
+#     except Exception as e:
+#         traceback.print_exc()
+#         raise HTTPException(status_code=500, detail=str(e))
+
+GCP_SERVER = "http://YOUR_GCP_EXTERNAL_IP:8000/predict"
+
 @app.post("/predict")
 async def predict_audio(file: UploadFile = File(...)):
     try:
-        input_path = os.path.join(TEMP_DIR, "sample.webm")
-        output_path = os.path.join(TEMP_DIR, "converted.wav")
+        uid = str(uuid.uuid4())
+        input_path = os.path.join(TEMP_DIR, f"{uid}.webm")
+        output_path = os.path.join(TEMP_DIR, f"{uid}.wav")
 
+        # save uploaded audio
         with open(input_path, "wb") as f:
             f.write(await file.read())
 
-        # ✅ FIXED: use partial for kwargs
+        # convert webm → wav (this part is SAFE on Render)
         ffmpeg_cmd = [
             FFMPEG_PATH,
             "-y",
             "-i", input_path,
+            "-acodec", "pcm_s16le",
             "-ar", "16000",
             "-ac", "1",
             output_path
         ]
-
-        # await run_in_threadpool(
-        #     partial(subprocess.run, ffmpeg_cmd, check=True)
-        # )
         await run_in_threadpool(
             partial(
                 subprocess.run,
@@ -72,11 +141,17 @@ async def predict_audio(file: UploadFile = File(...)):
                 stderr=subprocess.DEVNULL
             )
         )
-
-        # ✅ FIXED: ML inference also wrapped correctly
-        result = await run_in_threadpool(
-            partial(predict, output_path)
-        )
+        print("Converted WAV size:", os.path.getsize(output_path))
+        # 🔥 send WAV to GCP ML server instead of predicting locally
+        with open(output_path, "rb") as audio_file:
+            response = requests.post(
+            GCP_SERVER,
+            files={"file": ("audio.wav", audio_file, "audio/wav")},
+            timeout=300
+            )
+        result = response.json()["prediction"]
+        os.remove(input_path)
+        os.remove(output_path)
 
         return JSONResponse({
             "status": "ok",
@@ -86,7 +161,6 @@ async def predict_audio(file: UploadFile = File(...)):
     except Exception as e:
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
-
 @app.get("/result", response_class=HTMLResponse)
 def result(request: Request):
     """
@@ -97,8 +171,6 @@ def result(request: Request):
         "result.html",
         {"request": request}
     )
-
-
 # -------------------- SERVER --------------------
 
 if __name__ == "__main__":

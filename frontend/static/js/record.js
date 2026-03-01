@@ -4,6 +4,37 @@ let audioChunks = [];
 const startBtn = document.getElementById("start");
 const stopBtn = document.getElementById("stop");
 const statusText = document.getElementById("status");
+const MIN_SECONDS = 30;
+
+
+let timerInterval;
+let secondsElapsed = 0;
+
+const timerText = document.getElementById("timer");
+
+function startTimer() {
+  secondsElapsed = 0;
+  timerText.innerText = "00:00";
+
+  stopBtn.disabled = true; // ⛔ disable Stop initially
+
+  timerInterval = setInterval(() => {
+    secondsElapsed++;
+    const mins = String(Math.floor(secondsElapsed / 60)).padStart(2, "0");
+    const secs = String(secondsElapsed % 60).padStart(2, "0");
+    timerText.innerText = `${mins}:${secs}`;
+
+    // ✅ Enable Stop after 30 sec
+    if (secondsElapsed === MIN_SECONDS) {
+      stopBtn.disabled = false;
+      statusText.innerText = "✅ You can stop recording now";
+    }
+  }, 1000);
+}
+
+function stopTimer() {
+  clearInterval(timerInterval);
+}
 
 startBtn.onclick = async () => {
   try {
@@ -23,6 +54,23 @@ startBtn.onclick = async () => {
     };
 
 mediaRecorder.onstop = () => {
+  // stopTimer();
+  // const audioBlob = new Blob(audioChunks, { type: "audio/webm" });
+
+  stopTimer();
+
+  // ⛔ Minimum 30-second validation
+  if (secondsElapsed < MIN_SECONDS) {
+    statusText.innerText =
+      `Recording too short ❌ Please record at least ${MIN_SECONDS} seconds.`;
+
+    audioChunks = [];          // discard audio
+    startBtn.disabled = false; // allow retry
+    stopBtn.disabled = true;
+    return;                    // ❌ DO NOT PROCESS
+  }
+
+  // ✅ Continue normally if >= 30 sec
   const audioBlob = new Blob(audioChunks, { type: "audio/webm" });
 
   const formData = new FormData();
@@ -72,6 +120,8 @@ mediaRecorder.onstop = () => {
 };
 
     mediaRecorder.start();
+    startTimer();
+
     statusText.innerText = "Recording...";
     startBtn.disabled = true;
     stopBtn.disabled = false;

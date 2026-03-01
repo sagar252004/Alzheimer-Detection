@@ -1,17 +1,5 @@
---extra-index-url https://download.pytorch.org/whl/cpu
-torch==2.10.0+cpu
-librosa
-praat-parselmouth
-openai-whisper
-spacy
-pandas
-tqdm
-joblib
-numpy
-scipy
-soundfile
-scikit-learn
-fastapi==0.110.0
-starlette==0.36.3
-uvicorn[standard]==0.29.0
+fastapi
+uvicorn
+jinja2
 python-multipart
+requests
