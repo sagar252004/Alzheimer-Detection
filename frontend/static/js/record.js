@@ -6,7 +6,6 @@ const stopBtn = document.getElementById("stop");
 const statusText = document.getElementById("status");
 const MIN_SECONDS = 30;
 
-
 let timerInterval;
 let secondsElapsed = 0;
 
@@ -97,7 +96,7 @@ mediaRecorder.onstop = () => {
   //       statusText.innerText = "Prediction failed";
   //     }
     // })
-    fetch("/predict", {
+    fetch("https://sagarrv252004-alzheimer-detection-api.hf.space/predict", {
       method: "POST",
       body: formData
     })
@@ -107,10 +106,10 @@ mediaRecorder.onstop = () => {
 
     sessionStorage.setItem(
       "prediction_result",
-      JSON.stringify(data.result)
+      JSON.stringify(data)
     );
 
-    window.location.href = "/result";
+    window.location.href = "result.html";
   });
 
       // .catch((err) => {

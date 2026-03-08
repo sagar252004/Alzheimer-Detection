@@ -69,10 +69,8 @@ def audio(request: Request):
 #             "-acodec", "pcm_s16le",
 #             "-ar", "16000",
 #             "-ac", "1",
-
 #             # 🔥 loudness normalize to speech level
 #             "-af", "loudnorm=I=-16:TP=-1.5:LRA=11",
-
 #             output_path
 # ]
 #         # await run_in_threadpool(
@@ -96,15 +94,12 @@ def audio(request: Request):
 #         # 🧹 cleanup temp files
 #         if os.path.exists(input_path):
 #             os.remove(input_path)
-
 #         if os.path.exists(output_path):
 #             os.remove(output_path)
-
 #         return JSONResponse({
 #             "status": "ok",
 #             "result": result
 #         })
-
 #     except Exception as e:
 #         traceback.print_exc()
 #         raise HTTPException(status_code=500, detail=str(e))
@@ -157,7 +152,6 @@ async def predict_audio(file: UploadFile = File(...)):
             "status": "ok",
             "result": result
         })
-
     except Exception as e:
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
