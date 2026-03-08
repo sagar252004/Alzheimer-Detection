@@ -22,7 +22,7 @@
 
   </div>
 
-  <script>
+  <!-- <script>
     const result = JSON.parse(sessionStorage.getItem("prediction_result"));
 
     const card = document.getElementById("result-card");
@@ -36,7 +36,24 @@
     } else {
       card.innerHTML = "<p>No prediction available.</p>";
     }
-  </script>
+  </script> -->
+  <script>
+  const stored = sessionStorage.getItem("prediction_result");
+  const card = document.getElementById("result-card");
+
+  if (!stored) {
+    card.innerHTML = "<p>No prediction available. Please run the test first.</p>";
+  } else {
+    const result = JSON.parse(stored);
+
+    card.innerHTML = `
+      <p><strong>Classification:</strong> ${result.classification}</p>
+      <p><strong>MMSE Score:</strong> ${result.mmse_score}</p>
+    `;
+
+    sessionStorage.removeItem("prediction_result");
+  }
+</script>
 
 </body>
 </html>
