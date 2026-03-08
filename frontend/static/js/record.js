@@ -100,9 +100,15 @@ mediaRecorder.onstop = () => {
   method: "POST",
   body: formData
 })
-.then(res => res.json())
-.then(data => {
+.then(async (res) => {
+  const data = await res.json();
+
   console.log("Prediction response:", data);
+
+  if (!data.classification || !data.mmse_score) {
+    statusText.innerText = "Prediction failed. Please try again.";
+    return;
+  }
 
   sessionStorage.setItem(
     "prediction_result",
@@ -110,6 +116,10 @@ mediaRecorder.onstop = () => {
   );
 
   window.location.href = "/result";
+})
+.catch(err => {
+  console.error(err);
+  statusText.innerText = "Server error while processing audio.";
 });
 
       // .catch((err) => {
