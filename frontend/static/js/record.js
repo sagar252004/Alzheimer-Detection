@@ -109,7 +109,7 @@ mediaRecorder.onstop = () => {
       JSON.stringify(data)
     );
 
-    window.location.href = "result.html";
+    window.location.href = "/result";
   });
 
       // .catch((err) => {
