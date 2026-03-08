@@ -96,21 +96,21 @@ mediaRecorder.onstop = () => {
   //       statusText.innerText = "Prediction failed";
   //     }
     // })
-    fetch("https://sagarrv252004-alzheimer-detection-api.hf.space/predict", {
-      method: "POST",
-      body: formData
-    })
-  .then(res => res.json())
-  .then(data => {
-    console.log("Prediction response:", data);
+  fetch("https://sagarrv252004-alzheimer-detection-api.hf.space/predict", {
+  method: "POST",
+  body: formData
+})
+.then(res => res.json())
+.then(data => {
+  console.log("Prediction response:", data);
 
-    sessionStorage.setItem(
-      "prediction_result",
-      JSON.stringify(data)
-    );
+  sessionStorage.setItem(
+    "prediction_result",
+    JSON.stringify(data)
+  );
 
-    window.location.href = "/result";
-  });
+  window.location.href = "/result";
+});
 
       // .catch((err) => {
       //   console.error("Predict error:", err);
