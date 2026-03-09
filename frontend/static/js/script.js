@@ -16,8 +16,8 @@ async function sendAudio() {
     try {
 
         const response = await 
-            // fetch("https://sagarrv252004-alzheimer-detection-api.hf.space/predict",{
-            fetch("https://sagarrv252004-alzheimer-detection-api.hf.space/gradio_api/predict", {
+            fetch("https://sagarrv252004-alzheimer-detection-api.hf.space/predict", {
+            // fetch("https://sagarrv252004-alzheimer-detection-api.hf.space/gradio_api/predict", {
                 method: "POST",
                 body: formData
             }
