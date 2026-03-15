@@ -4,21 +4,49 @@
   <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
+
 <div class="card">
   <h2>Patient Details</h2>
 
-  <form action="/audio">
-    <input type="text" placeholder="Patient Name" required>
-    <input type="number" placeholder="Age" required>
+  <form onsubmit="savePatientDetails(event)">
 
-    <select required>
+    <input id="name" type="text" placeholder="Patient Name" required>
+
+    <input id="age" type="number" placeholder="Age" required>
+
+    <select id="gender" required>
       <option value="">Gender</option>
       <option>Male</option>
       <option>Female</option>
     </select>
 
     <button type="submit">Continue</button>
+
   </form>
+
+   <button onclick="window.location.href='/patients'" style="margin-top:15px;">
+    View Saved Patient Records
+  </button>
 </div>
+
+<script>
+
+function savePatientDetails(event){
+
+    event.preventDefault();
+
+    const name = document.getElementById("name").value;
+    const age = document.getElementById("age").value;
+    const gender = document.getElementById("gender").value;
+
+    sessionStorage.setItem("name", name);
+    sessionStorage.setItem("age", age);
+    sessionStorage.setItem("gender", gender);
+
+    window.location.href = "/audio";
+}
+
+</script>
+
 </body>
 </html>

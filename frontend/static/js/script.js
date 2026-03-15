@@ -15,22 +15,37 @@ async function sendAudio() {
 
     try {
 
-        const response = await 
-            fetch("https://sagarrv252004-alzheimer-detection-api.hf.space/predict", {
-            // fetch("https://sagarrv252004-alzheimer-detection-api.hf.space/gradio_api/predict", {
-                method: "POST",
-                body: formData
-            }
-        );
+        // call YOUR backend instead of HuggingFace
+        const response = await fetch("/predict", {
+            method: "POST",
+            body: formData
+        });
 
         const data = await response.json();
 
-        document.getElementById("result").innerText =
-            "Classification: " + data.classification +
-            " | MMSE Score: " + data.mmse_score;
+        if (data.status !== "ok") {
+            document.getElementById("result").innerText = "Prediction failed.";
+            return;
+        }
+
+        const predictionText = data.prediction;
+
+        // show result
+        document.getElementById("result").innerText = predictionText;
+
+        // store values for result page + database
+        sessionStorage.setItem("prediction", predictionText);
+        sessionStorage.setItem("voice_file", data.voice_file);
+
+        console.log("Stored values:", {
+            prediction: sessionStorage.getItem("prediction"),
+            voice_file: sessionStorage.getItem("voice_file")
+        });
 
     } catch (error) {
-        document.getElementById("result").innerText = "Error connecting to API";
+
+        document.getElementById("result").innerText = "Error connecting to server";
         console.error(error);
+
     }
 }

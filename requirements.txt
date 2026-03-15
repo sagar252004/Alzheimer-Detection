@@ -3,3 +3,6 @@ uvicorn
 jinja2
 python-multipart
 requests
+pymongo
+cloudinary
+python-dotenv

@@ -96,25 +96,31 @@ mediaRecorder.onstop = () => {
   //       statusText.innerText = "Prediction failed";
   //     }
   //   // })
-  fetch("https://sagarrv252004-alzheimer-detection-api.hf.space/predict", {
-  // fetch("https://sagarrv252004-alzheimer-detection-api.hf.space/gradio_api/predict", {
-  method: "POST",
-  body: formData
+//   fetch("https://sagarrv252004-alzheimer-detection-api.hf.space/predict", {
+//   // fetch("https://sagarrv252004-alzheimer-detection-api.hf.space/gradio_api/predict", {
+//   method: "POST",
+//   body: formData
+// })
+  fetch("/predict", {
+    method: "POST",
+    body: formData
 })
 .then(async (res) => {
+
   const data = await res.json();
 
   console.log("Prediction response:", data);
 
-  if (!data.classification || !data.mmse_score) {
+  if (data.status !== "ok") {
     statusText.innerText = "Prediction failed. Please try again.";
     return;
   }
 
-  sessionStorage.setItem(
-    "prediction_result",
-    JSON.stringify(data)
-  );
+  // store prediction
+  sessionStorage.setItem("prediction", data.prediction);
+
+  // store audio URL from backend (Cloudinary)
+  sessionStorage.setItem("voice_file", data.voice_file);
 
   window.location.href = "/result";
 })

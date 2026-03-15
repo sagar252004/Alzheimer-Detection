@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Patient Records</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+
+    <style>
+
+        body{
+            background:#f4f6f9;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .container{
+            max-width:1100px;
+            margin:auto;
+            margin-top:40px;
+        }
+
+        h1{
+            text-align:center;
+            margin-bottom:30px;
+        }
+
+        .card{
+            background:white;
+            padding:25px;
+            border-radius:12px;
+            box-shadow:0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        table{
+            width:100%;
+            border-collapse:collapse;
+        }
+
+        thead{
+            background:#4CAF50;
+            color:white;
+        }
+
+        th, td{
+            padding:12px;
+            text-align:center;
+        }
+
+        tr:nth-child(even){
+            background:#f9f9f9;
+        }
+
+        tr:hover{
+            background:#eef7ff;
+        }
+
+        audio{
+            width:180px;
+        }
+
+        .back-btn{
+            margin-top:20px;
+            padding:10px 20px;
+            background:#4CAF50;
+            border:none;
+            color:white;
+            border-radius:6px;
+            cursor:pointer;
+        }
+
+        .back-btn:hover{
+            background:#45a049;
+        }
+
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Patient Records</h1>
+
+<div class="card">
+
+<table>
+
+<thead>
+<tr>
+    <th>Patient Name</th>
+    <th>Age</th>
+    <th>Prediction Result</th>
+    <th>Voice Recording</th>
+    <th>Date</th>
+</tr>
+</thead>
+
+<tbody>
+
+{% for p in patients %}
+
+<tr>
+    <td>{{ p.name }}</td>
+
+    <td>{{ p.age }}</td>
+
+    <td>{{ p.prediction }}</td>
+
+    <td>
+        <audio controls>
+            <source src="{{ p.voice_file }}" type="audio/wav">
+        </audio>
+    </td>
+
+    <td>{{ p.created_at.strftime('%d %b %Y') if p.created_at else '' }}</td>
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+</div>
+
+<div style="text-align:center;">
+<button class="back-btn" onclick="window.location.href='/'">
+Back to Home
+</button>
+</div>
+
+</div>
+
+</body>
+</html>

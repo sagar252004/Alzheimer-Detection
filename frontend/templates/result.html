@@ -3,57 +3,103 @@
 <head>
   <title>Result</title>
   <link rel="stylesheet" href="/static/css/style.css">
+
+  <style>
+
+    .result-card{
+        background:white;
+        padding:25px;
+        border-radius:10px;
+        box-shadow:0 4px 10px rgba(0,0,0,0.08);
+        text-align:center;
+        margin-top:20px;
+    }
+
+    .score{
+        font-size:26px;
+        font-weight:bold;
+        margin-top:10px;
+    }
+
+    .normal{
+        color:#2ecc71;
+    }
+
+    .risk{
+        color:#e74c3c;
+    }
+
+    .audio-box{
+        margin-top:20px;
+    }
+
+  </style>
 </head>
 
 <body class="result-page">
 
-  <div class="result-container">
+<div class="result-container">
 
-    <h2>Alzheimer Detection Result</h2>
+<h2>Alzheimer Detection Result</h2>
 
-    <!-- DO NOT change class or id -->
-    <div class="card" id="result-card">
-      <p>Loading result...</p>
-    </div>
+<div class="result-card" id="result-card">
 
-    <button onclick="window.location.href='/'">
-      Test Another Patient
-    </button>
+<p>Loading result...</p>
 
+</div>
+
+<button onclick="window.location.href='/'">
+Test Another Patient
+</button>
+
+<button onclick="savePatient()">
+Save Patient Record
+</button>
+
+</div>
+
+<script>
+
+const prediction = sessionStorage.getItem("prediction");
+const voiceFile = sessionStorage.getItem("voice_file");
+
+const card = document.getElementById("result-card");
+
+if(!prediction){
+
+  card.innerHTML = "<p>No prediction available. Please run the test first.</p>";
+
+}else{
+
+  const parts = prediction.split("|");
+
+  const classification = parts[0].replace("Classification:","").trim();
+  const mmse = parts[1].replace("MMSE Score:","").trim();
+
+  const riskClass = classification.toLowerCase().includes("normal") ? "normal" : "risk";
+
+  card.innerHTML = `
+  
+  <h3>Classification</h3>
+  <p class="score ${riskClass}">${classification}</p>
+
+  <h3>MMSE Score</h3>
+  <p class="score">${mmse}</p>
+
+  <div class="audio-box">
+      <h3>Voice Recording</h3>
+      <audio controls>
+          <source src="${voiceFile}">
+      </audio>
   </div>
 
-  <!-- <script>
-    const result = JSON.parse(sessionStorage.getItem("prediction_result"));
+  `;
 
-    const card = document.getElementById("result-card");
+}
 
-    if (result) {
-      card.innerHTML = `
-        <p><strong>Classification:</strong> ${result.classification}</p>
-        <p><strong>MMSE Score:</strong> ${result.mmse_score}</p>
-        
-      `;
-    } else {
-      card.innerHTML = "<p>No prediction available.</p>";
-    }
-  </script> -->
-  <script>
-  const stored = sessionStorage.getItem("prediction_result");
-  const card = document.getElementById("result-card");
-
-  if (!stored) {
-    card.innerHTML = "<p>No prediction available. Please run the test first.</p>";
-  } else {
-    const result = JSON.parse(stored);
-
-    card.innerHTML = `
-      <p><strong>Classification:</strong> ${result.classification}</p>
-      <p><strong>MMSE Score:</strong> ${result.mmse_score}</p>
-    `;
-
-    sessionStorage.removeItem("prediction_result");
-  }
 </script>
+
+<script src="/static/js/savePatient.js"></script>
 
 </body>
 </html>
