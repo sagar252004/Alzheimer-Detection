@@ -1,15 +1,17 @@
 from pymongo import MongoClient
+import os
+from dotenv import load_dotenv
 
-# MongoDB Atlas connection string
-MONGO_URI = "mongodb+srv://sagarrv152_db_user:ZT54gSFR8LedNnC9@cluster0.qnidgrt.mongodb.net/alzheimers_db?retryWrites=true&w=majority&appName=Cluster0"
+load_dotenv()
 
-# Connect to MongoDB
-client = MongoClient(MONGO_URI)
+mongo_uri = os.getenv("MONGO_URI")
 
-# Database
+client = MongoClient(mongo_uri)
+
+# Check connection
+client.server_info()
+
 db = client["alzheimers_db"]
-
-# Collection
 patients_collection = db["patients"]
 
 print("✅ MongoDB Atlas connected successfully")
